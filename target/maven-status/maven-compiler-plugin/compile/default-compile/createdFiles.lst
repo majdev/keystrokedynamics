@@ -1,0 +1,10 @@
+com/microfocus/keystrokedynamics/controller/DatabaseJDBCImpl.class
+com/microfocus/keystrokedynamics/controller/DBController.class
+com/microfocus/keystrokedynamics/model/SecurityAnswer.class
+com/microfocus/keystrokedynamics/model/UserData.class
+com/microfocus/keystrokedynamics/model/SignUpData.class
+com/microfocus/keystrokedynamics/controller/DatabaseJDBC.class
+com/microfocus/keystrokedynamics/model/User.class
+com/microfocus/keystrokedynamics/model/AnswerData.class
+com/microfocus/keystrokedynamics/model/SignInData.class
+com/microfocus/keystrokedynamics/App.class
