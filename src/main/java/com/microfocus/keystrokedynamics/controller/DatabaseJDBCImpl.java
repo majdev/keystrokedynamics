@@ -11,8 +11,12 @@ import org.apache.log4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.microfocus.keystrokedynamics.App;
+import com.microfocus.keystrokedynamics.constants.Constants;
 import com.microfocus.keystrokedynamics.model.AnswerData;
 import com.microfocus.keystrokedynamics.model.SignInData;
+import com.microfocus.keystrokedynamics.model.SignUpData;
+import com.microfocus.keystrokedynamics.model.TrainingDBData;
+import com.microfocus.keystrokedynamics.model.TrainingData;
 import com.microfocus.keystrokedynamics.model.UserData;
 
 public class DatabaseJDBCImpl implements DatabaseJDBC{
@@ -70,6 +74,24 @@ public class DatabaseJDBCImpl implements DatabaseJDBC{
 			         pst.setString(2, ((AnswerData) pushIndex).getSecondans());
 			         pst.setString(3, ((AnswerData) pushIndex).getThirdans());
 	        	 }
+	        	 else
+	        		 if(pushIndex instanceof TrainingDBData){
+	        			 pst.setInt(1, ((TrainingDBData) pushIndex).getUserid());
+	    		         pst.setString(2, "");			//TODO : Hardcode the static string
+	    		         pst.setString(3, ((TrainingDBData) pushIndex).getFirstTimeArray());
+	    		         pst.setString(4, "");			//TODO : Hardcode the static string
+	    		         pst.setString(5, ((TrainingDBData) pushIndex).getSecondTimeArray());
+	    		         pst.setString(6, "");			//TODO : Hardcode the static string
+	    		         pst.setString(7, ((TrainingDBData) pushIndex).getThirdTimeArray());
+	    		         pst.setString(8, "");			//TODO : Hardcode the static string
+	    		         pst.setString(9, ((TrainingDBData) pushIndex).getFourthTimeArray());
+	    		         pst.setString(10, "");			//TODO : Hardcode the static string
+	    		         pst.setString(11, ((TrainingDBData) pushIndex).getFifthTimeArray());
+	    		         pst.setString(12, ((TrainingDBData) pushIndex).getUsername());			
+	    		         pst.setString(13, ((TrainingDBData) pushIndex).getUserTimeArray());
+	    		         pst.setString(14, findPwdByUserID(conn, ((TrainingDBData) pushIndex).getUserid()));			
+	    		         pst.setString(15, ((TrainingDBData) pushIndex).getPwdTimeArray());
+	        		 }
 	         pst.executeUpdate();
 		}
 		catch(SQLException e){
@@ -89,12 +111,50 @@ public class DatabaseJDBCImpl implements DatabaseJDBC{
 		return 201;
 	}
 	
+	
+	
+	@Override
+	public String findPwdByUserID(Connection conn, int id) {
+		conn = connectToDB();
+		PreparedStatement pst = null;
+		try{
+			pst = conn.prepareStatement("SELECT PASSWORD FROM USERINFO WHERE ID = "+id);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				return rs.getString("password");
+			return null;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			logger.info("Error, retrieving password ");
+		}
+		return null;
+	}
+
 	public boolean findByUserNamePwd(Connection conn, SignInData signInData){
 		boolean found = false;
 		conn = connectToDB();
 		PreparedStatement pst = null;
 		try{
-			pst = conn.prepareStatement("SELECT * FROM "+DBController.USER_TABLE.toUpperCase()+" WHERE USERNAME = '"+signInData.getUsername()+"' AND PASSWORD = '"+signInData.getPassword()+"'");
+			pst = conn.prepareStatement("SELECT * FROM "+Constants.USER_TABLE.toUpperCase()+" WHERE USERNAME = '"+signInData.getUsername()+"' AND PASSWORD = '"+signInData.getPassword()+"'");
+			ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				return true;
+			return false;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			logger.info("Error, retrieving password and username");
+		}
+		return found;
+	}
+	
+	public boolean findByUserName(Connection conn, SignUpData signUpData){
+		boolean found = false;
+		conn = connectToDB();
+		PreparedStatement pst = null;
+		try{
+			pst = conn.prepareStatement("SELECT * FROM "+Constants.USER_TABLE.toUpperCase()+" WHERE USERNAME = '"+signUpData.getUsername()+"'");
 			ResultSet rs = pst.executeQuery();
 			if(rs.next())
 				return true;
@@ -133,5 +193,25 @@ public class DatabaseJDBCImpl implements DatabaseJDBC{
 		}
 		
 	}
+
+	public int findUserIDByUserName(Connection conn, TrainingData trainData) {
+
+		conn = connectToDB();
+		PreparedStatement pst = null;
+		try{
+			pst = conn.prepareStatement("SELECT ID FROM USERINFO WHERE USERNAME = '"+trainData.getUsername()+"'");
+			ResultSet rs = pst.executeQuery();
+			if(rs.next())
+				return rs.getInt("id");
+			return -1;
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			logger.info("Error, retrieving password and username");
+		}
+		return -1;
+	}
+	
+	
 
 }

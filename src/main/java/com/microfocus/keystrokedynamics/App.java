@@ -1,11 +1,17 @@
 package com.microfocus.keystrokedynamics;
 
+import java.net.NetworkInterface;
 import java.sql.Connection;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+import java.util.function.Function;
 
 import org.apache.log4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
+import com.microfocus.keystrokedynamics.constants.Constants;
 import com.microfocus.keystrokedynamics.controller.DBController;
 import com.microfocus.keystrokedynamics.controller.DatabaseJDBCImpl;
 
@@ -15,7 +21,8 @@ public class App
 {
 	
 	private static final Logger logger = Logger.getLogger(App.class);
-    public static void main( String[] args )
+	
+	public static void main( String[] args )
     {
     	 SpringApplication.run(App.class, args);  
     	 init();
@@ -24,40 +31,44 @@ public class App
     public static void init(){
     	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
     	Connection conn = db.connectToDB();
-    	int status = -1;
-    	String userTableCreateQuery = "CREATE TABLE userinfo " +
-                "(id SERIAL PRIMARY KEY     NOT NULL," +
-                " firstname       CHAR(50)  NOT NULL, " +
-                " lastname        CHAR(50)  NOT NULL, " +
-                " username        CHAR(50) 	NOT NULL, " +
-                " password        CHAR(50)	NOT NULL, " +
-                " dob			  CHAR(50)  NOT NULL, "+
-                " empid			  CHAR(10)	NOT NULL) ";
-    	
-    	String securityTableCreateQuery = "CREATE TABLE securityans " +
-                "(id SERIAL PRIMARY KEY     NOT NULL," +
-                " firstans           CHAR(50)    NOT NULL, " +
-                " secondans          CHAR(50)    NOT NULL, " +
-                " thirdans           CHAR(50) 	 NOT NULL) ";
-    	
-    	if(conn!=null){
-    		logger.info("Coonection to db created succesfully!!!");
-    		status  = db.createTable(conn, DBController.USER_TABLE, userTableCreateQuery);
-    		if(status==201){
-    			logger.info("UserInfo Table created!!!");
-    			status  = db.createTable(db.connectToDB(), DBController.SECURITY_ANS_TABLE, securityTableCreateQuery);
-    			if(status ==201)
-    				logger.info("Security Answer Table Created");
-    			else
-    				logger.info("Error creating securityans table!!!");
-    		}
-    		else
-    			logger.info("Error creating Userinfo Table!!!");
-
-    	}
-    	else
-    		logger.info("Error connecting to database!!!");
-    	
-    		
+    	ScheduledExecutorService executor =  Executors.newScheduledThreadPool(1);
+    	Function< String, String> shutdownService = (v)->{
+    		executor.shutdown();
+    		return "";
+    	};
+    	Runnable createTableTask = ()->{
+        	int status = -1;
+    		if(conn!=null){
+    			logger.info("Coonection to db created succesfully!!!");
+        		status  = db.createTable(conn, Constants.USER_TABLE, Constants.userTableCreateQuery);
+        		if(status==201){
+        			logger.info("UserInfo Table created!!!");
+        			status  = db.createTable(db.connectToDB(), Constants.SECURITY_ANS_TABLE, Constants.securityTableCreateQuery);
+        			if(status ==201){
+        				logger.info("Security Answer Table Created");
+            			status  = db.createTable(db.connectToDB(), Constants.TRAINING_DATA_TABLE, Constants.trainingDataTableCreateQuery);
+            			if(status ==201){
+            				logger.info("Training data table created!!!");
+            				status = db.createTable(db.connectToDB(), Constants.TRAINING_OUTPUT_TABLE, Constants.trainingOutputTableCreateQuery);
+            				if(status == 201){
+            					logger.info("Training output table created");
+            					shutdownService.apply("");
+            				}
+            				else
+            					logger.info("Error creating training output table");
+            			}
+            			else
+            				logger.info("Error creating training data table");
+        			}
+        			else
+        				logger.info("Error creating securityans table!!!");
+        		}
+        		else
+        			logger.info("Error creating Userinfo Table!!!");
+        	}
+        	else
+        		logger.info("Error connecting to database!!!");
+    	};
+    	executor.scheduleAtFixedRate(createTableTask, 0, 5, TimeUnit.MINUTES);
     }
 }

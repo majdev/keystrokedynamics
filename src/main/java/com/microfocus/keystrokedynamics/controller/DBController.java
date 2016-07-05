@@ -14,9 +14,12 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.microfocus.keystrokedynamics.App;
+import com.microfocus.keystrokedynamics.constants.Constants;
 import com.microfocus.keystrokedynamics.model.AnswerData;
 import com.microfocus.keystrokedynamics.model.SignInData;
 import com.microfocus.keystrokedynamics.model.SignUpData;
+import com.microfocus.keystrokedynamics.model.TrainingDBData;
+import com.microfocus.keystrokedynamics.model.TrainingData;
 import com.microfocus.keystrokedynamics.model.User;
 import com.microfocus.keystrokedynamics.model.UserData;
 import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
@@ -24,13 +27,7 @@ import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 @RestController
 @RequestMapping("/ksdynamics")
 public class DBController {
-	public static final String USER_TABLE = "userinfo";
 	private static final Logger logger = Logger.getLogger(App.class);
-
-	public static final String SECURITY_ANS_TABLE =  "securityans";
-	private static final String SEC_ANS_INSERT_QUERY = "INSERT INTO securityans(firstans, secondans, thirdans) VALUES(?,?,?)";
-	private static final String USER_INSERT_QUERY = "INSERT INTO userinfo(firstname, lastname, username,password,dob,empid) VALUES(?, ?,?,?,?,?)";
-
     private final AtomicLong counter = new AtomicLong();
 
     @RequestMapping(value="/signup",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
@@ -39,12 +36,15 @@ public class DBController {
     	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
     	Connection conn = db.connectToDB();
     	int status = -1;
+    	boolean foundUserName = db.findByUserName(conn, signUpData);
+    	if(foundUserName)
+    		return new ResponseEntity<String>("{\"Status\": 409}", HttpStatus.OK);
     	UserData userInfo = new UserData(signUpData.getFirstname(), signUpData.getLastname(), signUpData.getUsername(), signUpData.getPassword(),signUpData.getDob(), signUpData.getEmpid());
     	AnswerData answerInfo = new AnswerData(signUpData.getFirstans(), signUpData.getSecondans(), signUpData.getThirdans());
-    	status = db.insertData(conn, USER_TABLE, USER_INSERT_QUERY,userInfo);
+    	status = db.insertData(conn, Constants.USER_TABLE, Constants.USER_INSERT_QUERY,userInfo);
     	if(status == 201){
     		logger.info("UserInfo indexed into user table!!!");
-        	status  = db.insertData(conn, SECURITY_ANS_TABLE, SEC_ANS_INSERT_QUERY,answerInfo);
+        	status  = db.insertData(conn, Constants.SECURITY_ANS_TABLE, Constants.SEC_ANS_INSERT_QUERY,answerInfo);
         	if(status == 201 )
         		logger.info("Security ANswers indexed into answer table!!!");
         	else
@@ -60,7 +60,7 @@ public class DBController {
     }
     
     @RequestMapping(value="/signin",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
-    public ResponseEntity<String> postSignInData(@RequestBody SignInData signInData) {
+    public ResponseEntity<String> postSignInData(@RequestBody SignInData signInData) {   //TODO : sigin data include timing array field of username and password
     	
     	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
     	Connection conn = db.connectToDB();
@@ -68,14 +68,50 @@ public class DBController {
     	found = db.findByUserNamePwd(conn, signInData);
     	if(found){
     		logger.info("Credentials Matched, now Check for Typing METADATA!!!");
-    		//TODO: execute R Script
+    		//TODO : Get the timing data of username and pwd and write to file for R to execute
+    		//TODO : check training table whether data is there, if not direct to page for training else do following
+    		//TODO: execute R authenticator Script to check for impostor
+    		//TODO : if matched , allow else dont
     		return new ResponseEntity<String>("{\"Found\" :\"true\"}",HttpStatus.OK);
     	}
     	else
     		logger.info("Credentials not matched");
     	return new ResponseEntity<String>("{\"Found\":\"false\"}",HttpStatus.OK);
+    }
+    
+    @RequestMapping(value="/postTrainData",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
+    public ResponseEntity<String> postTrainingData(@RequestBody TrainingData trainData) {   
+    	int id = -1;
+    	int status = -1;
+    	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
+    	Connection conn = db.connectToDB();
+    	id = db.findUserIDByUserName(conn, trainData);
+    	if(id !=-1){
+    		TrainingDBData indexData = new TrainingDBData(id, trainData.getUsername(), trainData.getFirstTimeArray(), trainData.getSecondTimeArray()
+    				, trainData.getThirdTimeArray(), trainData.getFourthTimeArray(), trainData.getFifthTimeArray(), trainData.getUserTimeArray(),
+    				trainData.getPwdTimeArray());
+    		status = db.insertData(conn, Constants.TRAINING_DATA_TABLE, Constants.TRAIN_DATA_INSERT_QUERY, indexData);
+    		if(status == 201){
+    			logger.info("Inserted data into training data!!!");
+    			return new ResponseEntity<String>("{\"Created\":\"true\"}",HttpStatus.CREATED);
+    		}
+    		else
+    			logger.info("Error in indexing training data!!!");
+    	}
+    	else
+    		logger.info("Error retrieving user id from username.");
+    	return new ResponseEntity<String>("{\"Created\":\"false\"}",HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+    
+    @RequestMapping(value="/trainData",method= RequestMethod.GET,produces="application/json")
+    public ResponseEntity<String> trainingData() { 
+    	boolean status = false;
+    	//TODO : Read data from table parse and convert to file for r call trainer.R script and push the output to db
 
-    	
+    	if(status)
+        	return new ResponseEntity<String>("{\"Trained\":\"true\"}",HttpStatus.OK);
+    	else
+        	return new ResponseEntity<String>("{\"Trained\":\"false\"}",HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
 }
