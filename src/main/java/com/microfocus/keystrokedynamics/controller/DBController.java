@@ -1,6 +1,7 @@
 package com.microfocus.keystrokedynamics.controller;
 
 import java.sql.Connection;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.microfocus.keystrokedynamics.App;
 import com.microfocus.keystrokedynamics.constants.Constants;
+import com.microfocus.keystrokedynamics.csv.KeystrokeDataHandlers;
 import com.microfocus.keystrokedynamics.model.AnswerData;
 import com.microfocus.keystrokedynamics.model.SignInData;
 import com.microfocus.keystrokedynamics.model.SignUpData;
@@ -23,6 +25,7 @@ import com.microfocus.keystrokedynamics.model.TrainingDBData;
 import com.microfocus.keystrokedynamics.model.TrainingData;
 import com.microfocus.keystrokedynamics.model.User;
 import com.microfocus.keystrokedynamics.model.UserData;
+import com.microfocus.keystrokedynamics.pages.KeyParam;
 import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 
 @CrossOrigin(allowedHeaders="Content-Type",origins="*")
@@ -62,7 +65,7 @@ public class DBController {
     }
     
     @RequestMapping(value="/signin",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
-    public ResponseEntity<String> postSignInData(@RequestBody SignInData signInData) {   //TODO : sigin data include timing array field of username and password
+    public ResponseEntity<String> postSignInData(@RequestBody SignInData signInData) {   
     	logger.info("Hello you entered sigin endpount");
     	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
     	Connection conn = db.connectToDB();
@@ -70,11 +73,15 @@ public class DBController {
     	found = db.findByUserNamePwd(conn, signInData);
     	if(found){
     		logger.info("Credentials Matched, now Check for Typing METADATA!!!");
-    		//TODO : Get the timing data of username and pwd and write to file for R to execute
+    		List<KeyParam> listOfKeyLogs = KeystrokeDataHandlers.parseRawKSData(signInData.getPwdTimeArray());
+    		String currentTimeArray = KeystrokeDataHandlers.getHeader(listOfKeyLogs);
+    		currentTimeArray+=KeystrokeDataHandlers.getLine(listOfKeyLogs);
+    		boolean status = KeystrokeDataHandlers.writeToFile(currentTimeArray);
     		//TODO : check training table whether data is there, if not direct to page for training else do following
     		//TODO: execute R authenticator Script to check for impostor
     		//TODO : if matched , allow else dont
-    		return new ResponseEntity<String>("{\"Found\" :\"true\"}",HttpStatus.OK);
+    		if(status)
+    			return new ResponseEntity<String>("{\"Found\" :\"true\"}",HttpStatus.OK);
     	}
     	else
     		logger.info("Credentials not matched");

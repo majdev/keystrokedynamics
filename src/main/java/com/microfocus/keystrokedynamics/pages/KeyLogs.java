@@ -4,11 +4,22 @@ package com.microfocus.keystrokedynamics.pages;
  * Created by CKhadija on 8/7/2016.
  */
 public class KeyLogs {
-    float hold;
-    float keydown_keydown;
-    float keydown_keyup;
+	private String keyCode;
+    private float hold;
+    private float keydown_keydown;
+    private float keydown_keyup;
+    
+    
 
-    public float getHold() {
+    public String getKeyCode() {
+		return keyCode;
+	}
+
+	public void setKeyCode(String keyCode) {
+		this.keyCode = keyCode;
+	}
+
+	public float getHold() {
         return hold;
     }
 
