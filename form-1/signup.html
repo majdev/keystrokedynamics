@@ -106,18 +106,18 @@
                         		<div class="form-top-divider"></div>
                             </div>
                             <div class="form-bottom">
-			                    <form role="form" id="signUpForm" action="http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8081/user" class="registration-form" method="post">
+			                    <form role="form" id="signUpForm" action="http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8082/ksdynamics/signup" class="registration-form" method="post">
                                     <div class="form-group">
                                         <label class="sr-only" for="userName">Username</label>
-                                        <input type="text" name="userName" placeholder="Username" class="form-username form-control" id="userName" required="required" >
+                                        <input type="text" name="username" placeholder="Username" class="form-username form-control" id="username" required="required" >
                                     </div>
 			                    	<div class="form-group">
 			                    		<label class="sr-only" for="firstName">First name</label>
-			                        	<input type="text" name="firstName" placeholder="First name" class="form-first-name form-control" id="firstName" required="required">
+			                        	<input type="text" name="firstname" placeholder="First name" class="form-first-name form-control" id="firstname" required="required">
 			                        </div>
 			                        <div class="form-group">
 			                        	<label class="sr-only" for="lastName">Last name</label>
-			                        	<input type="text" name="lastName" placeholder="Last name" class="form-last-name form-control" id="lastName" required="required">
+			                        	<input type="text" name="lastname" placeholder="Last name" class="form-last-name form-control" id="lastname" required="required">
 			                        </div>
                                     <div class="form-group">
                                             <label class="sr-only" for="password">Password</label>
@@ -125,7 +125,7 @@
                                         </div>
                                     <div class="form-group">
                                         <label class="sr-only" for="empid">Employee ID</label>
-                                        <input type="number" name="empId" placeholder="Employee ID" class="form-empid form-control" id="empId" required="required">
+                                        <input type="number" name="empid" placeholder="Employee ID" class="form-empid form-control" id="empid" required="required">
                                     </div>
 			                        <div class="form-group">
 			                        	<label class="sr-only" for="dob">DOB</label>
@@ -203,18 +203,18 @@
                                            <!-- 
                                            /*uncomment this part when security questions can be added to dB */ 
                                            -->
-                                    <!-- <div class="form-group form-label">
+                                     <div class="form-group form-label">
                                         <label>Security Question 1</label>
-                                        <input type="text" name="form-sq1" placeholder="Answer" class="form-sq1 form-control" id="form-sq1" required="required">
+                                        <input type="text" name="firstans" placeholder="Answer" class="form-sq1 form-control" id="firstans" required="required">
                                     </div>  
                                     <div class="form-group form-label">
                                         <label>Security Question 2</label>
-                                        <input type="text" name="form-sq2" placeholder="Answer" class="form-sq2 form-control" id="form-sq2" required="required">
+                                        <input type="text" name="secondans" placeholder="Answer" class="form-sq2 form-control" id="secondans" required="required">
                                     </div>  
                                     <div class="form-group form-label">
                                         <label>Security Question 3</label>
-                                        <input type="text" name="form-sq3" placeholder="Answer" class="form-sq3 form-control" id="form-sq3" required="required">
-                                    </div>     -->
+                                        <input type="text" name="thirdans" placeholder="Answer" class="form-sq3 form-control" id="thirdans" required="required">
+                                    </div>     
 
 			                        <button type="submit" onclick="doAjaxPost()" class="btn" >Sign me up!</button>
 			                    </form>

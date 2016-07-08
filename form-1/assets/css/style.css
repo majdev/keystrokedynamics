@@ -234,3 +234,25 @@ only screen and (                min-resolution: 2dppx) {
 	font-family: "Times New Roman", Times, serif; color : #fff; 
     font-weight: 200;
 }
+.input-fields
+{
+	height : 50px;
+	background: #fff none repeat scroll 0 0;
+    border: 3px solid #fff;
+    border-radius: 4px;
+    box-shadow: none;
+    color: #888;
+    font-family: "Roboto",sans-serif;
+    font-size: 16px;
+    font-weight: 300;
+    line-height: 50px;
+    margin: 0;
+    padding: 0 20px;
+    transition: all 0.3s ease 0s;
+    vertical-align: middle;
+}
+.staticTexts{
+	color : #fff; 
+    font-weight: 300;
+    font-size:16px;
+}

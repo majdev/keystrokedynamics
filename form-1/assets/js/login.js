@@ -1,22 +1,5 @@
 $(document).ready(main); 
 
-function check(form)/*function to check userid & password*/
-{
-/*the following code checkes whether the entered userid and password are matching*/
-	if(form.username.value == "k" && form.password.value == "n")
-	{
-		// console.log(form.username.value);
-		 setCookie("loginName", form.username.value,7);
-		// console.log("cookie set");
-	 //  	window.location = "http://www.google.com";/*opens the target page while Id & password matches*/
-	 window.location = "../../staticTexts.html";	  	
-	}
-	else
-	{
-	 	alert("Error Password or Username")/*displays error message*/
-	}
-}
-
  function main(){
 
 //disable atocomplete
@@ -41,7 +24,6 @@ function setCookie(name,value,days) {
     }
     else var expires = "";
     document.cookie = name+"="+value+expires;
-    console.log(document.cookie);
 }
 function getCookie(name) 
 {

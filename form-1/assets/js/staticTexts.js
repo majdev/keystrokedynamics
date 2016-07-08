@@ -1,7 +1,7 @@
 var keyLogs = [];       //DS to store keystroke
 var resetsInAWord = [];
 var wrongAuthenticationRetries = 0;
-var reloadpage = 10;
+var reloadIndex = 0;
 var loginName;
 
 var InputType = {           //Something like ENUM to distinguish between textfields
@@ -17,9 +17,9 @@ var InputType = {           //Something like ENUM to distinguish between textfie
  var staticTextsValues = {
      staticText1 : "a",
      staticText2 : "b",
-     staticText3 : 'c',
-     staticText4 : 'd',
-     staticText5 : 'e'
+     staticText3 : "c",
+     staticText4 : "d",
+     staticText5 : "e"
  };
 
 //prototype for storing keystroke
@@ -53,9 +53,10 @@ function monitorTextField( textField, inputType, event ) {
     var value = document.getElementById(textField).value;
     var totalEntries =0;
     var i =0;
+    if(value !== null){
     if(keyLogs[inputType].length > 0)
         totalEntries = keyLogs[inputType].length;
-    //console.log(keyLogs[inputType]);
+    }
     if(event.type == 'keydown')
     {
         var eventRecording = true;
@@ -80,7 +81,7 @@ function monitorTextField( textField, inputType, event ) {
         if( eventRecording ) {
             keyLogs[inputType][totalEntries] = new Keystroke( event.keyCode, event.timeStamp, 0 );
         }
-}
+    }
 
     if(event.type == 'keyup')
     {    
@@ -127,7 +128,7 @@ function monitorTextField( textField, inputType, event ) {
     if(value === staticTextsValues.staticText5)
     {
         document.getElementById('staticText5').disabled = 'true';
-        submitForm();
+        
     }
 
 }
@@ -139,82 +140,18 @@ function unMonitorTextField( textField ) {
 }
 
 
-//TODO 2 :create a function to bind the listener to the respective fields, if any doubt contact me   
+$(document).ready(main);
 
-
-// TODO 3 : create a method to handle form data submit something like below :
-// function formSubmitHandle( inputType ) {
-
-//     var form = $( "#" + inputType );
-//     var inputField = getField(inputType);
-
-//     form.submit(function(event) {
-//         var dataOkay = true;
-
-//         if( inputType === InputType.username ) {
-//             // If the password was wrong, raise an alert
-//             if( inputField.val() !== inputField.attr('placeholder') ) {
-//                 resetAfterMistake( inputField );
-//                 dataOkay = false;
-//                 return false;
-//             }
-//         } else if( inputType === InputType.password ) {
-//             // Ensure the passwords match
-//             var passwordField = $("#password");
-//             var passwordRepeatField = $("#passwordRepeat");
-//             if( passwordField.val() !== passwordRepeatField.val() ) {
-//                 // Reset the passwords
-//                 passwordField.val('');
-//                 passwordRepeatField.val('');
-
-//                 // Insert an alert
-//                 console.log("Error: passwords don't match");
-//                 if( $('.alert').length === 0 ) {
-//                     passwordField.parent().parent().before(
-//                         '<div class="alert alert-block alert-error fade in pull-right">'
-//                             + '<button type="button" class="close" data-dismiss="alert" data-close="bindHelpPopup($(#' + inputField.attr('id') + '))">×</button>'
-//                             + '<h4 class="alert-heading">Passwords do not match</h4>'
-//                             + '<p>We\'ve reset the form so that you can retype your password.</p>'
-//                             + '<p>'
-//                             + '<a class="btn" href="#" onclick="$(\'.alert\').alert(\'close\');">OK</a>'
-//                             + '</p>'
-//                             + '</div>');
-//                 }
-//                 return false;
-//             }
-//         }// similarly handle for others, i have not added all.
-
-//         // Add the invisible field which will allow us to send timing data
-//         if( dataOkay ) {
-//             // If this is an account creation or account training, set the keystroke data 
-//             if( inputType === InputType.//CREATE || inputType === InputType.//TRAIN ) {
-//                 getTimingField(InputType.//monitoredFIeld).val(serialisedEntiredata(monitoredField));
-//             }
-
-//             // Set the key phrase's timing data
-//             getTimingField(inputType).val(serialisedEntiredata(inputType));
-//             return true;
-//         } else {
-
-//             return false;
-//         }
-//     });
-// }// this is just a prototype add if something is missing
-
-// TODO create getTimingField method which will return the hidden field for storing data
 function main(){
 
     //get session
     loginName = getCookie("loginName");
-    if(loginName === null)
-    {
-        alert('user logged out');
-    }
-    else
+    if(loginName !== null)
     {
         document.getElementById("ks_username_display").value(loginName);
 
     }
+    setCookie("reloadIndex","",-1);
     disableStaticTexts();
 
     for( var i in InputType) {
@@ -231,10 +168,11 @@ function main(){
 
 function serialisedEntiredata( inputType ) {
     var s = "";
-    var key = "#" + getTextField(inputType).attr('id');
-    for (var i = 0; i < keyLogs[key].length; i++) {
-        s += keyLogs[key][i].serialize() + " ";
+    //var key = "#" + getTextField(inputType).attr('id');
+    for (var i = 0; i < keyLogs[inputType].length; i++) {
+        s += keyLogs[inputType][i].serialize() + " ";
     }
+    console.log(s);
     return s;
 }
 
@@ -247,9 +185,6 @@ function serialisedEntiredata( inputType ) {
 
 
 //create a main method where you will disable autocomplete for chrome browser
-
-$(document).ready(main);
-
 /*
 ** Returns the caret (cursor) position of the specified text field.
 ** Return value range is 0-oField.value.length.
@@ -301,14 +236,80 @@ document.getElementById('staticTextLabel5').style.display = 'none';
 document.getElementById('staticText1').focus();
 }
 
-function submitForm()
-{
-   alert('success'); 
-   reloadpage--;
-   if(reloadpage == 0)
-   {
+function doAjaxPost() {
+    // get the form values
+        setKeystrokeValueToFields();
+        var frm = $('#formInputRecord');
+        var dataToSend ={
+            username : document.getElementById('username').value,
+            userTimeArray : document.getElementById('userTimeArray').value,
+            pwdTimeArray : document.getElementById('pwdTimeArray').value,
+            firstTimeArray : document.getElementById('firstTimeArray').value,
+            secondTimeArray : document.getElementById('secondTimeArray').value,
+            thirdTimeArray : document.getElementById('thirdTimeArray').value,
+            fourthTimeArray : document.getElementById('fourthTimeArray').value,
+            fifthTimeArray : document.getElementById('fifthTimeArray').value
+        }
+        console.log(JSON.stringify(dataToSend));
+    $.ajax({
+        contentType:'application/json; charset=UTF-8',
+        dataType: 'json',
+        type: frm.attr('method'),
+        url: frm.attr('action'),
+        data: JSON.stringify(dataToSend),
+        success: function(response){
+        //window.location.reload(true);
+        window.location.reload(true);
+         },
+         error: function(e){
+             alert('Error: ' + e);
+             window.location.reload(true);
+         }
+    });
 
-   }
+}
+
+function doAjaxGet()
+{
+    $.ajax({
+      type: "GET",
+      url: "http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8082/ksdynamics/trainData",
+      cache: false,
+      success: function(data){
+         alert('success');
+         window.open("http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8080/index.html","_self");
+      }
+    });
+
+}
+
+function ConvertFormToJSON(form){
+    var array = jQuery(form).serializeArray();
+    var json = {};
+    
+    jQuery.each(array, function() {
+        json[this.name] = this.value || '';
+    });
+    
+    return json;
+}
+
+
+function endSession()
+{
+    reloadpage = 1;
+    setCookie("loginName","",-1)
+    setCookie("reloadIndex","",-1);
+}
+
+function setCookie(name,value,days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name+"="+value+expires;
 }
 
 function getCookie(name) 
@@ -318,8 +319,52 @@ function getCookie(name)
     for(var i=0;i < ca.length;i++) {
         var c = ca[i];
         while (c.charAt(0)==' ') c = c.substring(1,c.length);
-        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length,c.length);
+        if (c.indexOf(nameEQ) == 0) return c.substring(nameEQ.length, c.length);
     }
     return null;
+}
+
+function setKeystrokeValueToFields()
+{
+    document.getElementById('pwdTimeArray').value = serialisedEntiredata(InputType.password);
+    document.getElementById('userTimeArray').value = serialisedEntiredata(InputType.username);
+    document.getElementById('firstTimeArray').value = serialisedEntiredata(InputType.staticText1);
+    document.getElementById('secondTimeArray').value = serialisedEntiredata(InputType.staticText2);
+    document.getElementById('thirdTimeArray').value = serialisedEntiredata(InputType.staticText3);
+    document.getElementById('fourthTimeArray').value = serialisedEntiredata(InputType.staticText4);
+    document.getElementById('fifthTimeArray').value = serialisedEntiredata(InputType.staticText5);
+
+}
+
+function submitForm()
+{
+    reloadIndex = getCookie('reloadIndex');
+    console.log("cookie value "+ reloadIndex);
+
+    if(reloadIndex === null)
+    {
+        //first time call
+        setCookie('reloadIndex','0',7);
+        doAjaxPost();
+
+    }
+    else
+    {
+        var x = parseInt(reloadIndex, 10); // you want to use radix 10
+    // so you get a decimal number even with a leading 0 and an old browser
+        if(x < 10)
+        {
+            x++;
+            setCookie('reloadIndex',x,7);
+            doAjaxPost();
+        }
+        else
+        {
+            endSession();
+            doAjaxGet();
+            
+        }
+
+    }
 }
 

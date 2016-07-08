@@ -6,17 +6,8 @@ var wrongAuthenticationRetries = 0;
 var InputType = {           //Something like ENUM to distinguish between textfields
     username : 'username',     // TODO : create for all
     password : 'password',
-    staticText1 : 'staticText1',
-    staticText2 : 'staticText2',
-    staticText3 : 'staticText3',
-    staticText4 : 'staticText4',
-    staticText5 : 'staticText5'
 };
 
- var staticTextsValues = {
-    staticText1 : "abc",
-    staticText2 : "def"
- };
 
 //prototype for storing keystroke
 function Keystroke(keyCode, timeDown, timeUp) {
@@ -32,7 +23,6 @@ function keystrokeSerialize() {
 
 
 Keystroke.prototype.serialize = keystrokeSerialize;
-
 
 
 //TODO : Create a function "resetAfterMistake" for resetting field when a typo or mistake occurs and to reset the keylogs data for that as well
@@ -173,11 +163,9 @@ function main(){
  /*if( navigator.userAgent.toLowerCase().indexOf('chrome') >= 0 ) {
         setTimeout(function () {
             document.getElementById('userName').autocomplete = 'off';
-	    //TODO disable for all
+        //TODO disable for all
 
         }, 1);*/
-    disableStaticTexts();
-
     for( var i in InputType) {
         keyLogs[i] = [];
         resetsInAWord[i] = 0;
@@ -192,9 +180,8 @@ function main(){
 
 function serialisedEntiredata( inputType ) {
     var s = "";
-    var key = "#" + getTextField(inputType).attr('id');
-    for (var i = 0; i < keyLogs[key].length; i++) {
-        s += keyLogs[key][i].serialize() + " ";
+    for (var i = 0; i < keyLogs[inputType].length; i++) {
+        s += keyLogs[inputType][i].serialize() + " ";
     }
     return s;
 }
@@ -246,12 +233,47 @@ function doGetCaretPosition (textField) {
   return iCaretPos;
 }
 
-function disableStaticTexts()
+function doAjaxPost() {
+    // get the form values
+        setKeystrokeValueToFields();
+        var frm = $('#signInForm');
+        var dataToSend ={
+            username : document.getElementById('username').value,
+            userTimeArray : document.getElementById('userTimeArray').value,
+            password : document.getElementById('password').value,
+            pwdTimeArray : document.getElementById('pwdTimeArray').value
+        }
+        console.log(JSON.stringify(dataToSend));
+    $.ajax({
+        contentType:'application/json; charset=UTF-8',
+        dataType: 'json',
+        type: frm.attr('method'),
+        url: frm.attr('action'),
+        data: JSON.stringify(dataToSend),
+        success: function(response){
+            setCookie("loginName",document.getElementById('username').value,7);
+            // we have the response
+        alert('success');
+        window.open("http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8080/staticTexts.html","_self");
+        //window.open("index.html","_self")
+         },
+         error: function(e){
+             alert('Error: ' + e);
+             window.location.reload(true);
+         }
+    });
+}
+function setKeystrokeValueToFields()
 {
-if(document.getElementById('staticText2') != null)
-    document.getElementById('staticText2').style.visibility = 'hidden';
-// document.getElementById('staticText3').style.visibility = 'hidden';
-// document.getElementById('staticText4').style.visibility = 'hidden';
-// document.getElementById('staticText5').style.visibility = 'hidden';
-// document.getElementById('staticText1').focus();
+    document.getElementById('userTimeArray').value = serialisedEntiredata(InputType.username);
+    document.getElementById('pwdTimeArray').value = serialisedEntiredata(InputType.password);
+}
+function setCookie(name,value,days) {
+    if (days) {
+        var date = new Date();
+        date.setTime(date.getTime()+(days*24*60*60*1000));
+        var expires = "; expires="+date.toGMTString();
+    }
+    else var expires = "";
+    document.cookie = name+"="+value+expires;
 }

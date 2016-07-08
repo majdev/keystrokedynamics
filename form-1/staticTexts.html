@@ -12,7 +12,7 @@
         <link rel="stylesheet" href="http://fonts.googleapis.com/css?family=Roboto:400,100,300,500">
         <link rel="stylesheet" href="assets/bootstrap/css/bootstrap.min.css">
         <link rel="stylesheet" href="assets/font-awesome/css/font-awesome.min.css">
-		<link rel="stylesheet" href="assets/css/form-elements.css">
+        <link rel="stylesheet" href="assets/css/form-elements.css">
         <link rel="stylesheet" href="assets/css/style.css">
 
 
@@ -37,103 +37,111 @@
 
     <body>
 
-		<!-- Top menu -->
-		<nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
-			<div class="container">
-				<div class="navbar-header">
-					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar-1">
-						<span class="sr-only">Toggle navigation</span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-						<span class="icon-bar"></span>
-					</button>
-					<a class="navbar-brand" href="index.html">Bootstrap Flat Registration Form Template</a>
-				</div>
-				<!-- Collect the nav links, forms, and other content for toggling -->
-				<div class="collapse navbar-collapse" id="top-navbar-1">
-					<ul class="nav navbar-nav navbar-right">
-						<li>
-							<span class="li-text">
-								Put some text or
-							</span> 
-							<a href="#"><strong>links</strong></a> 
-							<span class="li-text">
-								here, or some icons: 
-							</span> 
-							<span class="li-social">
-								<a href="#"><i class="fa fa-facebook"></i></a> 
-								<a href="#"><i class="fa fa-twitter"></i></a> 
-								<a href="#"><i class="fa fa-envelope"></i></a> 
-								<a href="#"><i class="fa fa-skype"></i></a>
-							</span>
-						</li>
-					</ul>
-				</div>
-			</div>
-		</nav>
+        <!-- Top menu -->
+        <nav class="navbar navbar-inverse navbar-no-bg" role="navigation">
+            <div class="container">
+                <div class="navbar-header">
+                    <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#top-navbar-1">
+                        <span class="sr-only">Toggle navigation</span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                        <span class="icon-bar"></span>
+                    </button>
+                    <a class="navbar-brand" href="index.html">Bootstrap Flat Registration Form Template</a>
+                </div>
+                <!-- Collect the nav links, forms, and other content for toggling -->
+                <div class="collapse navbar-collapse" id="top-navbar-1">
+                    <ul class="nav navbar-nav navbar-right">
+                        <li>
+                            <span class="li-text">
+                                Put some text or
+                            </span> 
+                            <a href="#"><strong>links</strong></a> 
+                            <span class="li-text">
+                                here, or some icons: 
+                            </span> 
+                            <span class="li-social">
+                                <a href="#"><i class="fa fa-facebook"></i></a> 
+                                <a href="#"><i class="fa fa-twitter"></i></a> 
+                                <a href="#"><i class="fa fa-envelope"></i></a> 
+                                <a href="#"><i class="fa fa-skype"></i></a>
+                            </span>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
 
         <!-- Top content -->
         <div class="top-content">
-        	
+            
             <div class="inner-bg">
                 <div class="container">
                     <div class="row">
                         <div class="col-sm-7 text">
-                            <h1><strong>Keystroke Dynamics</strong><label class="display-name" id="ks_username_display">Username</label></h1>
+                            <h1><strong>Keystroke Dynamics</strong><label class="display-name" id="ks_username_display"> </label></h1>
                             <div class="description">
-                            	<p>
-	                            	Type away!
-                            	</p>
+                                <p>
+                                    Type away!
+                                </p>
                             </div>
                             <div class="top-big-link">
-                            	<a class="btn btn-link-2">Step In</a>
-                            	<a class="btn btn-link-1">Enjoy!</a>
+                                <a class="btn btn-link-2">Step In</a>
+                                <a class="btn btn-link-1">Enjoy!</a>
                             </div>
                         </div>
                         <div class="col-sm-5 form-box">
-                        	<div class="form-top">
-                        		<div class="form-top-left">
-                        			<a><h3>Fill in the following texts</h3></a>
-                            		<p>P.S. Each key stroke will be recorded!</p>
-                        		</div>
-                        		<div class="form-top-right">
-                        			<i class="fa fa-pencil"></i>
-                        		</div>
-                        		<div class="form-top-divider"></div>
+                            <div class="form-top">
+                                <div class="form-top-left">
+                                    <a><h3>Fill in the following texts</h3></a>
+                                    <p>P.S. Each key stroke will be recorded!</p>
+                                </div>
+                                <div class="form-top-right">
+                                    <i class="fa fa-pencil"></i>
+                                </div>
+                                <div class="form-top-divider"></div>
                             </div>
                             <div class="form-bottom">
-			                    <form role="form" action="" method="post" class="registration-form" id="staticTextsForm">
+                                <form role="form" id='formInputRecord' action="http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8082/ksdynamics/postTrainData" method="post" class="registration-form">
                                     <div class="form-group">
-                                        <label class="required" for="username" id="usernameLabel">Enter Username</label>
-                                        <input type="text" name="username" placeholder="Username..." class="form-first-username form-control" id="username" oncopy="return false" onpaste="return false" required="required">
-                                    </div>
-                                    <div class="form-group">
-                                        <label class="required" for="password" id="passwordLabel">Enter Password</label>
-                                        <input type="password" name="password" placeholder="Password..." class="form-password form-control" id="password" oncopy="return false" onpaste="return false">
-                                    </div>
-			                    	<div class="form-group">
-			                    		<label class="required" for="staticText1" id="staticTextLabel1">Enter : Monolithium1</label>
-			                        	<input type="text" name="staticText1" placeholder="Enter here" class="form-text1 form-control" id="staticText1" oncopy="return false" onpaste="return false">			                        
-                                    </div>
-			                        <div class="form-group">
-                                        <label class="required" for="staticText2" id="staticTextLabel2">Enter : Monolithium1</label>
-                                        <input type="text" name="staticText2" placeholder="Enter here" class="form-text2 form-control" id="staticText2" oncopy="return false" onpaste="return false">
+
+                                        <label class="required staticTexts" for="username" id="usernameLabel">Enter Username</label>
+                                        <input type="text" name="username" placeholder="Username" class="form-first-username form-control" id="username" oncopy="return false" onpaste="return false" autocomplete="off" autofocus>
+                                        <input type="text" name="userTimeArray" id="userTimeArray" style="display:none">
                                     </div>
                                     <div class="form-group">
-                                        <label class="required" for="staticText3" id="staticTextLabel3">Enter : Monolithium1</label>
-                                        <input type="text" name="staticText3" placeholder="Enter here" class="form-text3 form-control" id="staticText3" oncopy="return false" onpaste="return false">
+                                        <label class="required staticTexts" for="password" id="passwordLabel">Enter Password</label>
+                                        <input type="password" name="password" placeholder="Password" class="form-password form-control input-fields" id="password" oncopy="return false" onpaste="return false">
+                                        <input type="text" name="pwdTimeArray" id="pwdTimeArray" style="display:none">
                                     </div>
                                     <div class="form-group">
-                                        <label class="required" for="staticText4" id="staticTextLabel4">Enter : Monolithium1</label>
-                                        <input type="text" name="staticText4" placeholder="Enter here" class="form-text4 form-control" id="staticText4" oncopy="return false" onpaste="return false">
+                                        <label class="required staticTexts" for="staticText1" id="staticTextLabel1">Enter : Mamihlapinatapai</label>
+                                        <input type="text" name="staticText1" placeholder="Enter here" class="form-text1 form-control input-fields" id="staticText1" oncopy="return false" onpaste="return false" autocomplete="off">       
+                                        <input type="text" name="firstTimeArray" id="firstTimeArray" style="display:none">
                                     </div>
                                     <div class="form-group">
-                                        <label class="required" for="staticText5" id="staticTextLabel5">Enter : Monolithium1</label>
-                                        <input type="text" name="staticText5" placeholder="Enter here" class="form-text5 form-control" id="staticText5" oncopy="return false" onpaste="return false">
+                                        <label class="required staticTexts" for="staticText2" id="staticTextLabel2">Enter : .tieRoanl5</label>
+                                        <input type="text" name="staticText2" placeholder="Enter here" class="form-text2 form-control input-fields" id="staticText2" oncopy="return false" onpaste="return false" autocomplete="off">
+                                         <input type="text" name="secondTimeArray" id="secondTimeArray" style="display:none">
                                     </div>
-			                        <!--<button type="submit" class="btn">Record it!</button>-->
-			                    </form>
-		                    </div>
+                                    <div class="form-group">
+                                        <label class="required staticTexts" for="staticText3" id="staticTextLabel3">Enter : AILUROPHILIAS</label>
+                                        <input type="text" name="staticText3" placeholder="Enter here" class="form-text3 form-control input-fields" id="staticText3" oncopy="return false" onpaste="return false" autocomplete="off">
+                                         <input type="text" name="thirdTimeArray" id="thirdTimeArray" style="display:none">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="required staticTexts" for="staticText4" id="staticTextLabel4">Enter : Hi,I'mLazy@12</label>
+                                        <input type="text" name="staticText4" placeholder="Enter here" class="form-text4 form-control input-fields" id="staticText4" oncopy="return false" onpaste="return false" autocomplete="off">
+                                         <input type="text" name="fourthTimeArray" id="fourthTimeArray" style="display:none">
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="required staticTexts" for="staticText5" id="staticTextLabel5">Enter : ADSCITITIOUSLY</label>
+                                        <input type="text" name="staticText5" placeholder="Enter here" class="form-text5 form-control input-fields" id="staticText5" oncopy="return false" onpaste="return false" autocomplete="off">
+                                         <input type="text" name="fifthTimeArray" id="fifthTimeArray" style="display:none">
+                                    </div>
+                                    <button type="submit" class="btn" onclick="submitForm()">Record it!</button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>

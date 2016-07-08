@@ -55,34 +55,35 @@
 //         }
 //     });
 // }// this is just a prototype add if something is missing
-
-function onSignUp(form)
-{
-	//here
-  window.open('signin.html')
-}
 function doAjaxPost() {
     // get the form values
-	var frm = $('#signUpForm');
-    $.ajax({
-        contentType: "application/json; charset=utf-8",
-        dataType: "json",
-        type: frm.attr('method'),
-        url: frm.attr('action'),
-        data: ConvertFormToJSON(frm),
-        success: function(response){
-            // we have the response
-            if(response.status == "SUCCESS"){
-                alert('success');
-             }else{
-                 alert('failure');
+        var frm = $('#signUpForm');
+        // var dataToSend = {
+        //     userName : $('#userName').val(),
+        //     firstName : $('#firstName').val(),
+        //     lastName : $('#lastName').val(),
+        //     password : $('#password').val(),
+        //     empId : $('#empId').val(),
+        //     dob : $('#dob').val()
+        // }
+        console.log(JSON.stringify(ConvertFormToJSON(frm)));
+        $.ajax({
+            contentType:'application/json; charset=UTF-8',
+            dataType: 'json',
+            type: frm.attr('method'),
+            url: frm.attr('action'),
+            data: JSON.stringify(ConvertFormToJSON(frm)),
+            //data : dataToSend,
+            success: function(response){
+                // we have the response
+            window.open("http://ec2-52-26-120-166.us-west-2.compute.amazonaws.com:8080/index.html","_self");
+             },
+             error: function(e){
+                 alert('Error: ' + e);
              }
-         },
-         error: function(e){
-             alert('Error: ' + e);
-         }
-    });
+        });
 }
+
 function ConvertFormToJSON(form){
     var array = jQuery(form).serializeArray();
     var json = {};
@@ -93,3 +94,4 @@ function ConvertFormToJSON(form){
     
     return json;
 }
+
