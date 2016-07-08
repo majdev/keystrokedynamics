@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -24,6 +25,7 @@ import com.microfocus.keystrokedynamics.model.User;
 import com.microfocus.keystrokedynamics.model.UserData;
 import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 
+@CrossOrigin(allowedHeaders="Content-Type",origins="*")
 @RestController
 @RequestMapping("/ksdynamics")
 public class DBController {
@@ -55,13 +57,13 @@ public class DBController {
     		logger.info("Error in indexing into iserinfo table!!!");
 
     	if(status ==201)
-        	return new ResponseEntity<String>("{\"Status\":201}",HttpStatus.CREATED);
+        	return new ResponseEntity<String>("{\"Status\":201}",HttpStatus.OK);
     	return new ResponseEntity<String>("{\"Status\":500}",HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
     @RequestMapping(value="/signin",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
     public ResponseEntity<String> postSignInData(@RequestBody SignInData signInData) {   //TODO : sigin data include timing array field of username and password
-    	
+    	logger.info("Hello you entered sigin endpount");
     	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
     	Connection conn = db.connectToDB();
     	boolean found = false ;
@@ -93,7 +95,7 @@ public class DBController {
     		status = db.insertData(conn, Constants.TRAINING_DATA_TABLE, Constants.TRAIN_DATA_INSERT_QUERY, indexData);
     		if(status == 201){
     			logger.info("Inserted data into training data!!!");
-    			return new ResponseEntity<String>("{\"Created\":\"true\"}",HttpStatus.CREATED);
+    			return new ResponseEntity<String>("{\"Created\":\"true\"}",HttpStatus.OK);
     		}
     		else
     			logger.info("Error in indexing training data!!!");

@@ -13,7 +13,7 @@ public class Constants {
 		" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" ;
 
 	
-	public static final String userTableCreateQuery = "CREATE TABLE userinfo " +
+	public static final String userTableCreateQuery = "CREATE TABLE IF NOT EXISTS userinfo " +
             "(id SERIAL PRIMARY KEY     NOT NULL," +
             " firstname       CHAR(50)  NOT NULL, " +
             " lastname        CHAR(50)  NOT NULL, " +
@@ -22,13 +22,13 @@ public class Constants {
             " dob			  CHAR(50)  NOT NULL, "+
             " empid			  CHAR(10)	NOT NULL) ";
 	
-	public static final String securityTableCreateQuery = "CREATE TABLE securityans " +
+	public static final String securityTableCreateQuery = "CREATE TABLE IF NOT EXISTS securityans " +
             "(id SERIAL PRIMARY KEY     NOT NULL," +
             " firstans           CHAR(50)    NOT NULL, " +
             " secondans          CHAR(50)    NOT NULL, " +
             " thirdans           CHAR(50) 	 NOT NULL) ";
 	
-	public static final String trainingDataTableCreateQuery = "CREATE TABLE trainingdata "+
+	public static final String trainingDataTableCreateQuery = "CREATE TABLE IF NOT EXISTS trainingdata "+
 			"(userid			 	 INTEGER 	 NOT NULL," +
 			" phraseone			     CHAR(50)	 NOT NULL," +
 			" timeone			 	 CHAR(5000)	 NOT NULL," +
@@ -45,7 +45,7 @@ public class Constants {
 			" pwdphrase			 	 CHAR(50)	 NOT NULL," +
 			" pwdtime		 	 	 CHAR(5000)	 NOT NULL) ";
 
-	public static final String trainingOutputTableCreateQuery = "CREATE TABLE trainingoutput "+
+	public static final String trainingOutputTableCreateQuery = "CREATE TABLE IF NOT EXISTS trainingoutput "+
 			"(userid			 	 INTEGER 	 NOT NULL," +
 			" phraseone			     CHAR(50)	 NOT NULL," +
 			" outputone			 	 CHAR(5000)	 NOT NULL," +
