@@ -1,6 +1,7 @@
 package com.microfocus.keystrokedynamics.controller;
 
 import java.sql.Connection;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -25,14 +26,16 @@ import com.microfocus.keystrokedynamics.model.TrainingDBData;
 import com.microfocus.keystrokedynamics.model.TrainingData;
 import com.microfocus.keystrokedynamics.model.User;
 import com.microfocus.keystrokedynamics.model.UserData;
+import com.microfocus.keystrokedynamics.model.Username;
 import com.microfocus.keystrokedynamics.pages.KeyParam;
-import com.sun.org.apache.xerces.internal.util.HTTPInputSource;
 
 @CrossOrigin(allowedHeaders="Content-Type",origins="*")
 @RestController
 @RequestMapping("/ksdynamics")
 public class DBController {
 	private static final Logger logger = Logger.getLogger(App.class);
+	private static final String CURRENT_FILEPATH = "/home/ubuntu/r/current.csv";
+	private static final String TRAIN_FILEPATH = "/home/ubuntu/r/train.csv";
     private final AtomicLong counter = new AtomicLong();
 
     @RequestMapping(value="/signup",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
@@ -74,9 +77,9 @@ public class DBController {
     	if(found){
     		logger.info("Credentials Matched, now Check for Typing METADATA!!!");
     		List<KeyParam> listOfKeyLogs = KeystrokeDataHandlers.parseRawKSData(signInData.getPwdTimeArray());
-    		String currentTimeArray = KeystrokeDataHandlers.getHeader(listOfKeyLogs);
-    		currentTimeArray+=KeystrokeDataHandlers.getLine(listOfKeyLogs);
-    		boolean status = KeystrokeDataHandlers.writeToFile(currentTimeArray);
+    		String currentTimeArray = KeystrokeDataHandlers.getHeader(listOfKeyLogs,false);
+    		currentTimeArray+=KeystrokeDataHandlers.getLine(listOfKeyLogs,-1);
+    		boolean status = KeystrokeDataHandlers.writeToFile(currentTimeArray,CURRENT_FILEPATH);
     		//TODO : check training table whether data is there, if not direct to page for training else do following
     		//TODO: execute R authenticator Script to check for impostor
     		//TODO : if matched , allow else dont
@@ -112,10 +115,24 @@ public class DBController {
     	return new ResponseEntity<String>("{\"Created\":\"false\"}",HttpStatus.INTERNAL_SERVER_ERROR);
     }
     
-    @RequestMapping(value="/trainData",method= RequestMethod.GET,produces="application/json")
-    public ResponseEntity<String> trainingData() { 
+    @RequestMapping(value="/trainData",method= RequestMethod.POST,produces="application/json",consumes="application/json")
+    public ResponseEntity<String> trainingData(@RequestBody Username user) { 
     	boolean status = false;
-    	//TODO : Read data from table parse and convert to file for r call trainer.R script and push the output to db
+    	DatabaseJDBCImpl db = new DatabaseJDBCImpl();
+    	Connection conn = db.connectToDB();
+
+    	ArrayList<ArrayList<KeyParam>> listOfKeyParams = new ArrayList<ArrayList<KeyParam>>();
+    	List<String> listTimeArray = db.findTimeArrayByUserIDnPhrase(conn, user.getUsername());
+    	for(String timeArray:listTimeArray){
+    		listOfKeyParams.add(KeystrokeDataHandlers.parseRawKSData(timeArray));
+    	}
+    	String content = "";
+    	content =KeystrokeDataHandlers.getHeader(listOfKeyParams.get(0), true);
+    	for(int i =0;i<listOfKeyParams.size();i++){
+    		content+=KeystrokeDataHandlers.getLine(listOfKeyParams.get(i), i);
+    	}
+    	status = KeystrokeDataHandlers.writeToFile(content,TRAIN_FILEPATH);
+    	//TODO :  for r call trainer.R script and push the output to db
 
     	if(status)
         	return new ResponseEntity<String>("{\"Trained\":\"true\"}",HttpStatus.OK);

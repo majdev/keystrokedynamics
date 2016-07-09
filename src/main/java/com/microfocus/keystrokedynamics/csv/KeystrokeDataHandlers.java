@@ -18,10 +18,9 @@ public class KeystrokeDataHandlers {
 	private static final Logger logger = Logger.getLogger(App.class);
 
 	private static final double MILLI_TO_SECS = 1.0/1000.0;
-	private static final String FILEPATH = "/home/ubuntu/r/current.csv";
 	
-	public static List<KeyParam> parseRawKSData(String timingArray){
-		List<KeyParam> listOfKeyLogs = new ArrayList<KeyParam>();
+	public static ArrayList<KeyParam> parseRawKSData(String timingArray){
+		ArrayList<KeyParam> listOfKeyLogs = new ArrayList<KeyParam>();
 		String keyLogs[] = timingArray.split(" ");
 		for(String keyLog : keyLogs){
 			keyLog = keyLog.trim();
@@ -59,9 +58,11 @@ public class KeystrokeDataHandlers {
 		return listOfKeyLogs;
 	}
 	
-	public static String getHeader(List<KeyParam> listOfKeyLogs){
+	public static String getHeader(List<KeyParam> listOfKeyLogs,boolean train){
 		String header = "";
-		header = "hold["+listOfKeyLogs.get(0).getKeyCode()+"]";
+		if(train)
+			header+="repetition,";
+		header += "hold["+listOfKeyLogs.get(0).getKeyCode()+"]";
 		String prevCode = listOfKeyLogs.get(0).getKeyCode();
 		int listSize = listOfKeyLogs.size();
 		for(int i =1;i<listSize;i++){
@@ -74,9 +75,11 @@ public class KeystrokeDataHandlers {
 		return header;
 	}
 	
-	public static String getLine(List<KeyParam> listOfKeyLogs){
+	public static String getLine(List<KeyParam> listOfKeyLogs,int reps){
 		String line = "";
 		
+		if(reps>=0)
+			line +=reps+",";
 		line += MILLI_TO_SECS * listOfKeyLogs.get(0).getHeld();
 		int listSize = listOfKeyLogs.size();
 		for(int i = 1;i<listSize;i++){
@@ -92,9 +95,9 @@ public class KeystrokeDataHandlers {
 		return line;
 	}
 	
-	public static boolean writeToFile(String content){
+	public static boolean writeToFile(String content,String filepath){
 		logger.info(content);
-		File file = new File(FILEPATH);
+		File file = new File(filepath);
 		try {
 			
 		// if file doesnt exists, then create it

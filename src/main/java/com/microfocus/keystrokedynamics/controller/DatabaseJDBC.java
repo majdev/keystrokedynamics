@@ -2,6 +2,7 @@ package com.microfocus.keystrokedynamics.controller;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.List;
 
 import com.microfocus.keystrokedynamics.model.SignInData;
 import com.microfocus.keystrokedynamics.model.SignUpData;
@@ -25,5 +26,5 @@ public interface DatabaseJDBC {
 	
 	public String findPwdByUserID(Connection conn, int id);
 
-
+	public List<String> findTimeArrayByUserIDnPhrase(Connection conn,String username);
 }
