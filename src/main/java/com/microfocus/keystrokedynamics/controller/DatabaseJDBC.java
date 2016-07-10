@@ -27,4 +27,6 @@ public interface DatabaseJDBC {
 	public String findPwdByUserID(Connection conn, int id);
 
 	public List<String> findTimeArrayByUserIDnPhrase(Connection conn,String username);
+	
+	public String findTimingByUserID(Connection conn,String username);
 }

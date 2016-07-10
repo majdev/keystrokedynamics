@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
 import org.apache.log4j.Logger;
+import org.rosuda.REngine.REXP;
+import org.rosuda.REngine.REXPMismatchException;
+import org.rosuda.REngine.Rserve.RConnection;
+import org.rosuda.REngine.Rserve.RserveException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,6 +24,7 @@ import com.microfocus.keystrokedynamics.App;
 import com.microfocus.keystrokedynamics.constants.Constants;
 import com.microfocus.keystrokedynamics.csv.KeystrokeDataHandlers;
 import com.microfocus.keystrokedynamics.model.AnswerData;
+import com.microfocus.keystrokedynamics.model.DetectionData;
 import com.microfocus.keystrokedynamics.model.SignInData;
 import com.microfocus.keystrokedynamics.model.SignUpData;
 import com.microfocus.keystrokedynamics.model.TrainingDBData;
@@ -33,9 +38,10 @@ import com.microfocus.keystrokedynamics.pages.KeyParam;
 @RestController
 @RequestMapping("/ksdynamics")
 public class DBController {
-	private static final Logger logger = Logger.getLogger(App.class);
+	private static final Logger logger = Logger.getLogger(DBController.class);
 	private static final String CURRENT_FILEPATH = "/home/ubuntu/r/current.csv";
 	private static final String TRAIN_FILEPATH = "/home/ubuntu/r/train.csv";
+	private static final String MODEL = "/home/ubuntu/r/model";
     private final AtomicLong counter = new AtomicLong();
 
     @RequestMapping(value="/signup",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
@@ -80,15 +86,59 @@ public class DBController {
     		String currentTimeArray = KeystrokeDataHandlers.getHeader(listOfKeyLogs,false);
     		currentTimeArray+=KeystrokeDataHandlers.getLine(listOfKeyLogs,-1);
     		boolean status = KeystrokeDataHandlers.writeToFile(currentTimeArray,CURRENT_FILEPATH);
-    		//TODO : check training table whether data is there, if not direct to page for training else do following
+    		
+    		List<String> timingArays= db.findTimeArrayByUserIDnPhrase(db.connectToDB(), signInData.getUsername());
+    		if(timingArays.size()>0){
+    			RConnection connection = null;
+                try {
+                    /* Create a connection to Rserve instance running
+                     * on default port 6311
+                     */
+                	double detectionModel = 0.0;
+                    connection = new RConnection();
+                    String pwdTimingArray = db.findTimingByUserID(db.connectToDB(), signInData.getUsername());
+                    pwdTimingArray+="\n";
+                    KeystrokeDataHandlers.writeToFile(pwdTimingArray, MODEL);
+                    connection.eval("source('/home/ubuntu/r/authenticate.R')");
+                    REXP rx =connection.eval("train()");
+                    if (rx.inherits("try-error")) logger.info("Error: "+rx.asString());
+                    else
+                    	 detectionModel = rx.asDouble(); 
+                    logger.info(detectionModel);
+                    if(detectionModel<1.0)
+                    	return new ResponseEntity<String>("{\"CredsFound\":\"true\", \"TrainingData\":\"true\",\"ScoreMatch\":\"ksSuccess\"}",HttpStatus.OK);
+                    else
+                    	return new ResponseEntity<String>("{\"CredsFound\":\"true\", \"TrainingData\":\"true\",\"ScoreMatch\":\"ksFail\"}",HttpStatus.OK);
+
+                } catch (RserveException e) {
+                    e.printStackTrace();
+                } catch (REXPMismatchException e) {
+                    e.printStackTrace();
+                }finally{
+                    connection.close();
+                }
+    		}
+    		else{
+    			logger.info("Training data not found. Does not exist.");
+    	    	return new ResponseEntity<String>("{\"CredsFound\":\"true\", \"TrainingData\":\"false\",\"ScoreMatch\":\"ksFail\"}",HttpStatus.OK);
+    		}
+    		
+    		
+    		
+    		
+    		
+               
+
+
+                
     		//TODO: execute R authenticator Script to check for impostor
     		//TODO : if matched , allow else dont
     		if(status)
-    			return new ResponseEntity<String>("{\"Found\" :\"true\"}",HttpStatus.OK);
+    			return new ResponseEntity<String>("{\"CredsFound\":\"true\", \"TrainingData\":\"true\",\"ScoreMatch\":\"ksSuccess\"}",HttpStatus.OK);
     	}
     	else
     		logger.info("Credentials not matched");
-    	return new ResponseEntity<String>("{\"Found\":\"false\"}",HttpStatus.OK);
+    	return new ResponseEntity<String>("{\"CredsFound\":\"false\", \"TrainingData\":\"false\",\"ScoreMatch\":\"ksFail\"}",HttpStatus.OK);
     }
     
     @RequestMapping(value="/postTrainData",method= RequestMethod.POST,consumes = "application/json",produces="application/json")
@@ -131,9 +181,30 @@ public class DBController {
     	for(int i =0;i<listOfKeyParams.size();i++){
     		content+=KeystrokeDataHandlers.getLine(listOfKeyParams.get(i), i);
     	}
-    	status = KeystrokeDataHandlers.writeToFile(content,TRAIN_FILEPATH);
-    	//TODO :  for r call trainer.R script and push the output to db
-
+    	status =KeystrokeDataHandlers.writeToFile(content,TRAIN_FILEPATH);
+    	RConnection connection = null;
+        try {
+            /* Create a connection to Rserve instance running
+             * on default port 6311
+             */
+            connection = new RConnection();
+            connection.eval("source('/home/ubuntu/r/trainer.R')");
+            String detectionModel = connection.eval("train()").asString(); 
+            detectionModel = detectionModel.replaceFirst("[1] \"Serializing detection model\"", "");
+            String serialisedData = "";
+            detectionModel = detectionModel.replaceAll("/[[0-9]+] /", "");
+            detectionModel = detectionModel.replaceAll(" +", " ");
+            detectionModel = detectionModel.replaceAll("\"", "");
+            logger.info("\n\n\n\n"+detectionModel);
+            DetectionData detectionIndex= new DetectionData(user.getUsername(), detectionModel);
+            db.insertData(conn, Constants.TRAINING_OUTPUT_TABLE, Constants.TRAIN_OUTPUT_INSERT_QUERY, detectionIndex);
+        } catch (RserveException e) {
+            e.printStackTrace();
+        } catch (REXPMismatchException e) {
+            e.printStackTrace();
+        }finally{
+            connection.close();
+        }
     	if(status)
         	return new ResponseEntity<String>("{\"Trained\":\"true\"}",HttpStatus.OK);
     	else

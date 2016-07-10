@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import com.microfocus.keystrokedynamics.App;
 import com.microfocus.keystrokedynamics.constants.Constants;
 import com.microfocus.keystrokedynamics.model.AnswerData;
+import com.microfocus.keystrokedynamics.model.DetectionData;
 import com.microfocus.keystrokedynamics.model.SignInData;
 import com.microfocus.keystrokedynamics.model.SignUpData;
 import com.microfocus.keystrokedynamics.model.TrainingDBData;
@@ -90,11 +91,30 @@ public class DatabaseJDBCImpl implements DatabaseJDBC{
 	    		         pst.setString(9, ((TrainingDBData) pushIndex).getFourthTimeArray());
 	    		         pst.setString(10, "ADSCITITIOUSLY");			//TODO : Hardcode the static string
 	    		         pst.setString(11, ((TrainingDBData) pushIndex).getFifthTimeArray());
-	    		         pst.setString(12, ((TrainingDBData) pushIndex).getUsername());			
-	    		         pst.setString(13, ((TrainingDBData) pushIndex).getUserTimeArray());
+	    		         pst.setString(12, "");			
+	    		         pst.setString(13, "");
 	    		         pst.setString(14, findPwdByUserID(conn, ((TrainingDBData) pushIndex).getUserid()));			
 	    		         pst.setString(15, ((TrainingDBData) pushIndex).getPwdTimeArray());
 	        		 }
+	        		 else
+	        			 if(pushIndex instanceof DetectionData){
+	        				 int userID = findUserIDByUserName(connectToDB(), ((DetectionData) pushIndex).getUsername());
+	        				 pst.setInt(1, userID);
+		    		         pst.setString(2, "Mamihlapinatapai");			//TODO : Hardcode the static string
+		    		         pst.setString(3, "");
+		    		         pst.setString(4, ".tieRoanl5");			//TODO : Hardcode the static string
+		    		         pst.setString(5, "");
+		    		         pst.setString(6, "AILUROPHILIAS");			//TODO : Hardcode the static string
+		    		         pst.setString(7, "");
+		    		         pst.setString(8, "Hi,I'mLazy@12");			//TODO : Hardcode the static string
+		    		         pst.setString(9, "");
+		    		         pst.setString(10, "ADSCITITIOUSLY");			//TODO : Hardcode the static string
+		    		         pst.setString(11, "");
+		    		         pst.setString(12, "");			
+		    		         pst.setString(13, "");
+		    		         pst.setString(14, findPwdByUserID(conn, userID));			
+		    		         pst.setString(15, ((DetectionData) pushIndex).getDetectionModel());
+	        			 }
 	         pst.executeUpdate();
 		}
 		catch(SQLException e){
@@ -255,6 +275,27 @@ public class DatabaseJDBCImpl implements DatabaseJDBC{
 		catch(SQLException e){
 			e.printStackTrace();
 			logger.info("Error in retrieving time arrays");
+		}
+		return null;
+	}
+
+	@Override
+	public String findTimingByUserID(Connection conn, String username) {
+		conn = connectToDB();
+		int userid = findUserIDByUserName(conn, username);
+		logger.info(userid);
+		conn = connectToDB();
+		PreparedStatement pst = null;
+		try{
+			pst = conn.prepareStatement("SELECT PWDOUTPUT FROM TRAININGOUTPUT WHERE USERID = "+userid);
+			ResultSet rs = pst.executeQuery();
+			if(rs.next()){
+				return rs.getString("pwdoutput");
+			}
+		}
+		catch(SQLException e){
+			e.printStackTrace();
+			logger.info("Error in retrieving time array");
 		}
 		return null;
 	}

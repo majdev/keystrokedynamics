@@ -11,6 +11,10 @@ public class Constants {
 	public static final String TRAIN_DATA_INSERT_QUERY = "INSERT INTO trainingdata(userid, phraseone,timeone,phrasetwo,timetwo,phrasethree" +
 		",timethree,phrasefour,timefour,phrasefive,timefive,userphrase,usertime,pwdphrase,pwdtime)" +
 		" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)" ;
+	
+	public static final String TRAIN_OUTPUT_INSERT_QUERY = "INSERT INTO trainingoutput(userid, phraseone,outputone,phrasetwo,outputtwo,phrasethree" +
+		",outputthree,phrasefour,outputfour,phrasefive,outputfive,userphrase,useroutput,pwdphrase,pwdoutput)" +
+		" VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
 	
 	public static final String userTableCreateQuery = "CREATE TABLE IF NOT EXISTS userinfo " +
@@ -18,7 +22,7 @@ public class Constants {
             " firstname       CHAR(50)  NOT NULL, " +
             " lastname        CHAR(50)  NOT NULL, " +
             " username        CHAR(50) 	NOT NULL, " +
-            " password        CHAR(50)	NOT NULL, " +
+            " password        CHAR(100000)	NOT NULL, " +
             " dob			  CHAR(50)  NOT NULL, "+
             " empid			  CHAR(10)	NOT NULL) ";
 	
@@ -42,8 +46,8 @@ public class Constants {
 			" timefive		 	 	 CHAR(5000)	 NOT NULL," +
 			" userphrase			 CHAR(50)	 NOT NULL," +
 			" usertime		 	 	 CHAR(5000)	 NOT NULL," +
-			" pwdphrase			 	 CHAR(50)	 NOT NULL," +
-			" pwdtime		 	 	 CHAR(5000)	 NOT NULL) ";
+			" pwdphrase			 	 CHAR(100000)	 NOT NULL," +
+			" pwdtime		 	 	 CHAR(10000000)	 NOT NULL) ";
 
 	public static final String trainingOutputTableCreateQuery = "CREATE TABLE IF NOT EXISTS trainingoutput "+
 			"(userid			 	 INTEGER 	 NOT NULL," +
@@ -59,7 +63,7 @@ public class Constants {
 			" outputfive		 	 CHAR(5000)	 NOT NULL," +
 			" userphrase			 CHAR(50)	 NOT NULL," +
 			" useroutput		 	 CHAR(5000)	 NOT NULL," +
-			" pwdphrase			 	 CHAR(50)	 NOT NULL," +
-			" pwdoutput		 	 	 CHAR(5000)	 NOT NULL) ";
+			" pwdphrase			 	 CHAR(100000)	 NOT NULL," +
+			" pwdoutput		 	 	 CHAR(10000000)	 NOT NULL) ";
 
 }

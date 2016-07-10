@@ -35,7 +35,7 @@ public class KeystrokeDataHandlers {
 					case 1:	  obj.setKeydown(Double.parseDouble(ksParams[i].trim()));
 							  break;
 							  
-					case 2:	  obj.setKeydown(Double.parseDouble(ksParams[i].trim()));
+					case 2:	  obj.setKeyup(Double.parseDouble(ksParams[i].trim()));
 							  break;
 				}
 			}
