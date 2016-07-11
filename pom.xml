@@ -43,6 +43,13 @@
     	<artifactId>postgresql</artifactId> 
     	<version>9.4-1200-jdbc4</version> 
     </dependency>
+    <!-- https://mvnrepository.com/artifact/org.rosuda.REngine/Rserve -->
+	<dependency>
+    	<groupId>org.rosuda.REngine</groupId>
+    	<artifactId>Rserve</artifactId>
+    	<version>1.8.1</version>
+	</dependency>
+    
   </dependencies>
   
    <build>
